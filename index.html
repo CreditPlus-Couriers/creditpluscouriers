@@ -282,7 +282,66 @@ tsParticles.load("tsparticles", {
         else s.classList.add("active");
       }
     }
+function resetSteps() {
+  for (let i = 1; i <= 5; i++) {
+    const s = document.getElementById("step" + i);
+    s.className = "step p-3 rounded";
+  }
+}
 
+function highlightSteps(status) {
+  const mapping = {
+    "Order Received": 1,
+    "Dispatched": 2,
+    "In Transit": 3,
+    "Out for Delivery": 4,
+    "Delivered": 5
+  };
+  const current = mapping[status] || 3;
+  for (let i = 1; i <= current; i++) {
+    const s = document.getElementById("step" + i);
+    if (i < current)
+      s.classList.add("completed", "bg-green-600", "text-white");
+    else
+      s.classList.add("active");
+  }
+}
+
+function trackShipment() {
+  const input = document.getElementById("trackingInput").value.trim().toUpperCase();
+  const data = shipments[input];
+  const box = document.getElementById("trackingResult");
+  const error = document.getElementById("error");
+  const loading = document.getElementById("loadingOverlay");
+  const notice = document.getElementById("deliveryNotice");
+
+  resetSteps();
+
+  if (data) {
+    box.classList.remove("hidden");
+    error.classList.add("hidden");
+    loading.classList.add("hidden");
+
+    // Populate shipment history
+    document.getElementById("history").textContent = data.history[0] || "";
+    document.getElementById("history2").textContent = data.history[1] || "";
+    document.getElementById("history3").textContent = data.history[2] || "";
+
+    highlightSteps(data.status);
+
+    // Show animated delivery notice
+    if (data.status === "In Transit") {
+      notice.classList.remove("hidden");
+      notice.classList.add("animate-bounce"); // tailwind animation
+    } else {
+      notice.classList.add("hidden");
+    }
+
+  } else {
+    error.classList.remove("hidden");
+    box.classList.add("hidden");
+  }
+    }
     
     function trackShipment() {
       const input = document.getElementById("trackingInput").value.trim().toUpperCase();
