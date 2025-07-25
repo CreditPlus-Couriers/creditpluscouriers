@@ -280,11 +280,12 @@ tsParticles.load("tsparticles", {
       const loading = document.getElementById("loadingOverlay");
       box.classList.add("hidden");
 const notice = document.getElementById("deliveryNotice");
-if (data.status === "In Transit") {
+
+    if (data.status === "In Transit" || data.status === "Out for Delivery") {
   notice.classList.remove("hidden");
 } else {
   notice.classList.add("hidden");
-}
+    }
       err.classList.add("hidden");
       loading.classList.remove("hidden");
 
