@@ -271,80 +271,46 @@ tsParticles.load("tsparticles", {
     }
 
     
-    function trackShipment() {
-      const input = document.getElementById("trackingInput").value.trim().toUpperCase();
-      box.classList.add("hidden");
-err.classList.add("hidden");
-loading.classList.remove("hidden");
-const notice = document.getElementById("deliveryNotice");
-notice.classList.add("hidden");
+    function trackShipment() 
+      function track() {
+  const awb = document.getElementById("awbInput").value.trim().toUpperCase();
+  const data = shipments[awb];
+  const loading = document.getElementById("loading");
+  const result = document.getElementById("result");
+  const error = document.getElementById("error");
+  const notice = document.getElementById("deliveryNotice");
+  const historyList = document.getElementById("history");
 
-setTimeout(() => {
-  loading.classList.add("hidden");
-  const data = shipments[input];
-  if (data) {
-    document.getElementById("awb").innerText = input;
-    document.getElementById("customer").innerText = data.customer;
-    document.getElementById("origin").innerText = data.origin;
-    document.getElementById("destination").innerText = data.destination;
-    document.getElementById("lastUpdate").innerText = data.lastUpdate;
-    document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
-    data.history.forEach((h, i) => {
-      const el = document.getElementById("history" + (i + 1));
-      if (el) el.innerText = h;
-    });
-    box.classList.remove("hidden");
-    resetSteps();
-    highlightSteps(data.status);
+  result.style.display = "none";
+  error.style.display = "none";
+  notice.style.display = "none";
+  historyList.innerHTML = "";
+  loading.style.display = "block";
 
-    if (data.status === "In Transit" || data.status === "Out for Delivery") {
-      notice.classList.remove("hidden");
-    }
-  } else {
-    err.classList.remove("hidden");
-  }
-}, 1500);
-setTimeout(() => {
-  loading.classList.add("hidden");
-  if (data) {
-    document.getElementById("awb").innerText = input;
-    document.getElementById("customer").innerText = data.customer;
-    document.getElementById("origin").innerText = data.origin;
-    document.getElementById("destination").innerText = data.destination;
-    document.getElementById("lastUpdate").innerText = data.lastUpdate;
-    document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
-    data.history.forEach((h,i) => document.getElementById("history"+(i+1)).innerText = h);
-    box.classList.remove("hidden");
-    resetSteps(); highlightSteps(data.status);
-
-    const notice = document.getElementById("deliveryNotice");
-    if (data.status === "In Transit" || data.status === "Out for Delivery") {
-      notice.classList.remove("hidden");
+  setTimeout(() => {
+    loading.style.display = "none";
+    if (data) {
+      document.getElementById("customer").innerText = data.customer;
+      document.getElementById("origin").innerText = data.origin;
+      document.getElementById("destination").innerText = data.destination;
+      document.getElementById("status").innerText = data.status;
+      document.getElementById("lastUpdate").innerText = data.lastUpdate;
+      document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
+      document.getElementById("riderPhone").innerText = "+91 22 6809 1958";
+      data.history.forEach(entry => {
+        const li = document.createElement("li");
+        li.textContent = entry;
+        historyList.appendChild(li);
+      });
+      result.style.display = "block";
+      if (data.status === "Out for Delivery" || data.status === "In Transit") {
+        notice.style.display = "block";
+      }
     } else {
-      notice.classList.add("hidden");
+      error.style.display = "block";
     }
-  } else {
-    err.classList.remove("hidden");
-  }
-}, 1500);
-
-      setTimeout(() => {
-        loading.classList.add("hidden");
-        if (data) {
-          document.getElementById("awb").innerText = input;
-          document.getElementById("customer").innerText = data.customer;
-          document.getElementById("origin").innerText = data.origin;
-          document.getElementById("destination").innerText = data.destination;
-          document.getElementById("lastUpdate").innerText = data.lastUpdate;
-          document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
-          data.history.forEach((h,i) => document.getElementById("history"+(i+1)).innerText = h);
-          box.classList.remove("hidden");
-          resetSteps(); highlightSteps(data.status);
-        } else {
-          err.classList.remove("hidden");
-        }
-      }, 1500); // Simulate 1.5 sec loading delay
-    }
+  }, 1500);
+}
   </script>
 
 <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" 
