@@ -200,12 +200,9 @@ tsParticles.load("tsparticles", {
         <div class="step p-3 rounded" id="step4">Out for Delivery</div>
         <div class="step p-3 rounded" id="step5">Delivered</div>
       </div>
-      <div id="deliveryNotice" class="mt-6 hidden text-center text-sm font-semibold text-white bg-orange-500 p-3 rounded animate-glow animate-pulse">
-        <div id="deliveryNotice" class="hidden mt-4 text-center font-bold text-white bg-orange-600 p-3 rounded shadow-lg animate-pulse">
-  🚚 Delivery Partner Assigned: Noman Sharif Bardi +91 22 6809 1958 (Share OTP 56292)
-        </div>
-  🚚 Delivery Partner Assigned : Noman Sharif Bardi +91 22 6809 1958 (Share OTP 56292)
-
+      <div id="deliveryNotice" class="hidden mt-4 text-center font-bold text-white bg-orange-600 p-3 rounded shadow-lg animate-pulse">
+  🚚 Delivery Partner Assigned – Call: +91 22 6809 1958
+      </div>
       <h4 class="font-semibold text-orange-600 mb-2">Shipment History</h4>
       <ul class="list-disc list-inside text-xs text-gray-700 space-y-1">
         <li id="history1"></li>
@@ -223,34 +220,32 @@ tsParticles.load("tsparticles", {
 
   <script>
     const shipments = {
-      "AWB56200": {
-        customer: "Sujata Kurle",
-        origin: "PNQ Motherhub - 42(IN)",
-        destination: "Thane",
-        status: "Out for Delivery",
-        lastUpdate: "2025-07-24 13:46",
-        expectedDelivery: "2025-07-29",
-        history: [
-          "2025-07-18 09:00 · Order Received at PNQ",
-          "2025-07-18 18:45 · Dispatched from PNQ Motherhub",
-          "2025-07-27 13:46 · Out For Delivery (Delivery HUB)"
-        ]
-      },
-      "AWB56300": {
-        customer: "Mandar Rangole",
-        origin: "PNQ Motherhub - 42(IN)",
-        destination: "Ulwe, Navi Mumbai",
-        status: "Out for Delivery",
-        lastUpdate: "2025-07-24 13:46",
-        expectedDelivery: "2025-07-29
-          9",
-        history: [
-          "2025-07-18 09:00 · Order Received at PNQ",
-          "2025-07-18 18:45 · Dispatched from PNQ Motherhub",
-          "2025-07-27 13:46 · Out For Delivery (Delivery HUB)"
-        ]
-      }
-    };
+"AWB56200": {
+  customer: "Sujata Kurle",
+  origin: "PNQ Motherhub - 42(IN)",
+  destination: "Thane",
+  status: "Out for Delivery",
+  lastUpdate: "2025-07-27 13:46",
+  expectedDelivery: "2025-07-29",
+  history: [
+    "2025-07-18 09:00 · Order Received at PNQ",
+    "2025-07-18 18:45 · Dispatched from PNQ Motherhub",
+    "2025-07-27 13:46 · Out For Delivery (Delivery HUB)"
+  ]
+},
+"AWB56300": {
+  customer: "Mandar Rangole",
+  origin: "PNQ Motherhub - 42(IN)",
+  destination: "Ulwe, Navi Mumbai",
+  status: "Out for Delivery",
+  lastUpdate: "2025-07-27 13:46",
+  expectedDelivery: "2025-07-29",
+  history: [
+    "2025-07-18 09:00 · Order Received at PNQ",
+    "2025-07-18 18:45 · Dispatched from PNQ Motherhub",
+    "2025-07-27 13:46 · Out For Delivery (Delivery HUB)"
+  ]
+},
 
     function resetSteps() {
       for (let i = 1; i <= 5; i++) {
