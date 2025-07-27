@@ -275,14 +275,37 @@ tsParticles.load("tsparticles", {
     
     function trackShipment() {
       const input = document.getElementById("trackingInput").value.trim().toUpperCase();
-      const data = shipments[input];
-      const box = document.getElementById("trackingResult");
-      const err = document.getElementById("error");
-      const loading = document.getElementById("loadingOverlay");
       box.classList.add("hidden");
 err.classList.add("hidden");
 loading.classList.remove("hidden");
+const notice = document.getElementById("deliveryNotice");
+notice.classList.add("hidden");
 
+setTimeout(() => {
+  loading.classList.add("hidden");
+  const data = shipments[input];
+  if (data) {
+    document.getElementById("awb").innerText = input;
+    document.getElementById("customer").innerText = data.customer;
+    document.getElementById("origin").innerText = data.origin;
+    document.getElementById("destination").innerText = data.destination;
+    document.getElementById("lastUpdate").innerText = data.lastUpdate;
+    document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
+    data.history.forEach((h, i) => {
+      const el = document.getElementById("history" + (i + 1));
+      if (el) el.innerText = h;
+    });
+    box.classList.remove("hidden");
+    resetSteps();
+    highlightSteps(data.status);
+
+    if (data.status === "In Transit" || data.status === "Out for Delivery") {
+      notice.classList.remove("hidden");
+    }
+  } else {
+    err.classList.remove("hidden");
+  }
+}, 1500);
 setTimeout(() => {
   loading.classList.add("hidden");
   if (data) {
