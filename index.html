@@ -310,6 +310,44 @@ tsParticles.load("tsparticles", {
       error.style.display = "block";
     }
   }, 1500);
+    }
+  const awb = document.getElementById("awbInput").value.trim().toUpperCase();
+  const data = shipments[awb];
+  const loading = document.getElementById("loading");
+  const result = document.getElementById("result");
+  const error = document.getElementById("error");
+  const notice = document.getElementById("deliveryNotice");
+  const historyList = document.getElementById("history");
+
+  result.style.display = "none";
+  error.style.display = "none";
+  notice.style.display = "none";
+  historyList.innerHTML = "";
+  loading.style.display = "block";
+
+  setTimeout(() => {
+    loading.style.display = "none";
+    if (data) {
+      document.getElementById("customer").innerText = data.customer;
+      document.getElementById("origin").innerText = data.origin;
+      document.getElementById("destination").innerText = data.destination;
+      document.getElementById("status").innerText = data.status;
+      document.getElementById("lastUpdate").innerText = data.lastUpdate;
+      document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
+      document.getElementById("riderPhone").innerText = "+91 22 6809 1958";
+      data.history.forEach(entry => {
+        const li = document.createElement("li");
+        li.textContent = entry;
+        historyList.appendChild(li);
+      });
+      result.style.display = "block";
+      if (data.status === "Out for Delivery" || data.status === "In Transit") {
+        notice.style.display = "block";
+      }
+    } else {
+      error.style.display = "block";
+    }
+  }, 1500);
 }
   </script>
 
