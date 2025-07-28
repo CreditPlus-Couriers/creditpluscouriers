@@ -194,66 +194,8 @@
       }
     }
   }
-<script>
 function trackShipment() {
-  const input = document.getElementById("trackingInput").value.trim().toUpperCase();
-  const data = shipments[input];
-  const box = document.getElementById("trackingResult");
-  const err = document.getElementById("error");
-  const loading = document.getElementById("loadingOverlay");
-  const notice = document.getElementById("deliveryNotice");
 
-  box.classList.add("hidden");
-  err.classList.add("hidden");
-  notice.classList.add("hidden");
-  loading.classList.remove("hidden");
-
-  setTimeout(() => {
-    loading.classList.add("hidden");
-
-    if (data) {
-      document.getElementById("awb").innerText = input;
-      document.getElementById("customer").innerText = data.customer;
-      document.getElementById("origin").innerText = data.origin;
-      document.getElementById("destination").innerText = data.destination;
-      document.getElementById("lastUpdate").innerText = data.lastUpdate;
-      document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
-      const awbImage = document.getElementById("awbImage");
-if (input === "AWB56300") {
-  awbImage.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56300.jpg";
-  awbImage.classList.remove("hidden");
-} else {
-  awbImage.classList.add("hidden");
-  }
-
-      // Show image for AWB56300 only
-      const existingImg = document.getElementById("awbImage");
-      if (existingImg) existingImg.remove();
-      if (input === "AWB56300") {
-        const img = document.createElement("img");
-        img.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56300.jpg";
-        img.alt = "AWB56300 Document";
-        img.className = "w-full max-w-md mb-4 rounded shadow";
-        img.id = "awbImage";
-        box.prepend(img);
-      }
-
-      data.history.forEach((h, i) => document.getElementById("history" + (i + 1)).innerText = h);
-
-      if (data.status === "In Transit" || data.status === "Out for Delivery") {
-        notice.classList.remove("hidden");
-      }
-
-      box.classList.remove("hidden");
-      resetSteps();
-      highlightSteps(data.status);
-    } else {
-      err.classList.remove("hidden");
-    }
-  }, 1000);
-}
-</script>
-  
 </script>
 <!-- Scroll to Top Button -->
 <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" 
@@ -272,6 +214,49 @@ class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-l
 <footer class="bg-orange-600 text-white text-center py-3 text-xs mt-6">
   Privacy Policy | Terms & Conditions | Contact | Support | Courier Details
 </footer>
+  
+  <script>
+function trackShipment() {
+  err.classList.add("hidden");
+  notice.classList.add("hidden");
+  loading.classList.remove("hidden");
+
+  setTimeout(() => {
+    loading.classList.add("hidden");
+
+    if (data) {
+      document.getElementById("awb").innerText = input;
+      document.getElementById("customer").innerText = data.customer;
+      document.getElementById("origin").innerText = data.origin;
+      document.getElementById("destination").innerText = data.destination;
+      document.getElementById("lastUpdate").innerText = data.lastUpdate;
+      document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
+
+      const awbImage = document.getElementById("awbImage");
+      if (input === "AWB56300") {
+        awbImage.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56300.jpg";
+        awbImage.classList.remove("hidden");
+      } else {
+        awbImage.classList.add("hidden");
+      }
+
+      data.history.forEach((h, i) => {
+        const historyEl = document.getElementById("history" + (i + 1));
+        if (historyEl) historyEl.innerText = h;
+      });
+
+      if (data.status === "In Transit" || data.status === "Out for Delivery") {
+        notice.classList.remove("hidden");
+      }
+
+      box.classList.remove("hidden");
+      resetSteps();
+      highlightSteps(data.status);
+    } else {
+      err.classList.remove("hidden");
+    }
+  }, 1000);
+}
 
 <!-- Extended Footer -->
 <footer class="bg-white border-t border-orange-200 mt-16 pt-6 pb-10 px-4 text-center text-sm text-gray-600">
