@@ -193,45 +193,59 @@
       }
     }
   }
+<script>
+function trackShipment() {
+  const input = document.getElementById("trackingInput").value.trim().toUpperCase();
+  const data = shipments[input];
+  const box = document.getElementById("trackingResult");
+  const err = document.getElementById("error");
+  const loading = document.getElementById("loadingOverlay");
+  const notice = document.getElementById("deliveryNotice");
 
-  function trackShipment() {
-    const input = document.getElementById("trackingInput").value.trim().toUpperCase();
-    const data = shipments[input];
-    const box = document.getElementById("trackingResult");
-    const err = document.getElementById("error");
-    const loading = document.getElementById("loadingOverlay");
-    box.classList.add("hidden");
-    err.classList.add("hidden");
-    loading.classList.remove("hidden");
+  box.classList.add("hidden");
+  err.classList.add("hidden");
+  notice.classList.add("hidden");
+  loading.classList.remove("hidden");
 
-    setTimeout(() => {
-      loading.classList.add("hidden");
-      if (data) {
-        document.getElementById("awb").innerText = input;
-        document.getElementById("customer").innerText = data.customer;
-        document.getElementById("origin").innerText = data.origin;
-        document.getElementById("destination").innerText = data.destination;
-        document.getElementById("lastUpdate").innerText = data.lastUpdate;
-        document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
-        data.history.forEach((h, i) => {
-          document.getElementById("history" + (i + 1)).innerText = h;
-        });
+  setTimeout(() => {
+    loading.classList.add("hidden");
 
-        const notice = document.getElementById("deliveryNotice");
-        if (data.status === "In Transit" || data.status === "Out for Delivery") {
-          notice.classList.remove("hidden");
-        } else {
-          notice.classList.add("hidden");
-        }
+    if (data) {
+      document.getElementById("awb").innerText = input;
+      document.getElementById("customer").innerText = data.customer;
+      document.getElementById("origin").innerText = data.origin;
+      document.getElementById("destination").innerText = data.destination;
+      document.getElementById("lastUpdate").innerText = data.lastUpdate;
+      document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
 
-        box.classList.remove("hidden");
-        resetSteps();
-        highlightSteps(data.status);
-      } else {
-        err.classList.remove("hidden");
+      // Show image for AWB56300 only
+      const existingImg = document.getElementById("awbImage");
+      if (existingImg) existingImg.remove();
+      if (input === "AWB56300") {
+        const img = document.createElement("img");
+        img.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56300.jpg";
+        img.alt = "AWB56300 Document";
+        img.className = "w-full max-w-md mb-4 rounded shadow";
+        img.id = "awbImage";
+        box.prepend(img);
       }
-    }, 1000);
-  }
+
+      data.history.forEach((h, i) => document.getElementById("history" + (i + 1)).innerText = h);
+
+      if (data.status === "In Transit" || data.status === "Out for Delivery") {
+        notice.classList.remove("hidden");
+      }
+
+      box.classList.remove("hidden");
+      resetSteps();
+      highlightSteps(data.status);
+    } else {
+      err.classList.remove("hidden");
+    }
+  }, 1000);
+}
+</script>
+  
 </script>
 <!-- Scroll to Top Button -->
 <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" 
