@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Track packages and manage courier deliveries with Credit Plus Couriers. Secure, fast, and reliable logistics solutions.">
+  <meta name="description" content="Track packages and manage courier deliveries with Credit Plus Couriers.">
   <meta name="keywords" content="courier, delivery, tracking, logistics, shipping, parcel, AWB">
   <meta name="author" content="Credit Plus Couriers">
   <title>Credit Plus Couriers</title>
@@ -111,6 +111,7 @@
       <p><strong>Last Updated:</strong> <span id="lastUpdate"></span></p>
       <p><strong>Expected Delivery:</strong> <span id="expectedDelivery"></span></p>
     </div>
+
     <div id="deliveryNotice" class="mt-6 hidden text-center text-sm font-semibold text-white bg-orange-500 p-3 rounded animate-glow animate-pulse">
       🚚 Delivery Partner Assigned: +91 22 6809 1958 (Share OTP 56292)
     </div>
@@ -133,117 +134,121 @@
   </div>
 
   <div id="error" class="mt-4 text-red-600 hidden">Tracking ID not found. Please check and try again.</div>
-</section>
-
-<script>
-const shipments = {
-  "AWB56300": {
-    customer: "Mandar Rangole",
-    origin: "PNQ Motherhub - 42(IN)",
-    destination: "Ulwe, Navi Mumbai",
-    status: "Out for Delivery",
-    lastUpdate: "2025-07-27 13:46",
-    expectedDelivery: "2025-07-29",
-    history: [
-      "2025-07-18 09:00 · Order Received at PNQ",
-      "2025-07-18 18:45 · Dispatched from PNQ Motherhub",
-      "2025-07-27 13:46 · Out For Delivery (Delivery HUB)"
-    ]
-  },
-  "AWB56200": {
-    customer: "Sujata Kurle",
-    origin: "PNQ Motherhub - 42(IN)",
-    destination: "Thane",
-    status: "Out for Delivery",
-    lastUpdate: "2025-07-27 13:46",
-    expectedDelivery: "2025-07-29",
-    history: [
-      "2025-07-18 09:00 · Order Received at PNQ",
-      "2025-07-18 18:45 · Dispatched from PNQ Motherhub",
-      "2025-07-27 13:46 · Out For Delivery (Delivery HUB)"
-    ]
-  }
-};
-
-function resetSteps() {
-  for (let i = 1; i <= 5; i++) {
-    const s = document.getElementById("step" + i);
-    s.className = "step p-3 rounded";
-  }
-}
-
-function highlightSteps(status) {
-  const mapping = {
-    "Order Received": 1,
-    "Dispatched": 2,
-    "In Transit": 3,
-    "Out for Delivery": 4,
-    "Delivered": 5
+  </section>
+  <script>
+  const shipments = {
+    "AWB56300": {
+      customer: "Mandar Rangole",
+      origin: "PNQ Motherhub - 42(IN)",
+      destination: "Ulwe, Navi Mumbai",
+      status: "Out for Delivery",
+      lastUpdate: "2025-07-27 13:46",
+      expectedDelivery: "2025-07-29",
+      history: [
+        "2025-07-18 09:00 · Order Received at PNQ",
+        "2025-07-18 18:45 · Dispatched from PNQ Motherhub",
+        "2025-07-27 13:46 · Out For Delivery (Delivery HUB)"
+      ]
+    },
+    "AWB56200": {
+      customer: "Sujata Kurle",
+      origin: "PNQ Motherhub - 42(IN)",
+      destination: "Thane",
+      status: "Out for Delivery",
+      lastUpdate: "2025-07-27 13:46",
+      expectedDelivery: "2025-07-29",
+      history: [
+        "2025-07-18 09:00 · Order Received at PNQ",
+        "2025-07-18 18:45 · Dispatched from PNQ Motherhub",
+        "2025-07-27 13:46 · Out For Delivery (Delivery HUB)"
+      ]
+    }
   };
-  const current = mapping[status] || 3;
-  for (let i = 1; i <= current; i++) {
-    const s = document.getElementById("step" + i);
-    if (i < current) {
-      s.classList.add("completed", "bg-green-600", "text-white");
-    } else {
-      s.classList.add("active");
+
+  function resetSteps() {
+    for (let i = 1; i <= 5; i++) {
+      const s = document.getElementById("step" + i);
+      s.className = "step p-3 rounded";
     }
   }
-}
-  function trackShipment() {
-  const input = document.getElementById("trackingInput").value.trim().toUpperCase();
-  const data = shipments[input];
-  const box = document.getElementById("trackingResult");
-  const err = document.getElementById("error");
-  const loading = document.getElementById("loadingOverlay");
-  const notice = document.getElementById("deliveryNotice");
 
-  box.classList.add("hidden");
-  err.classList.add("hidden");
-  notice.classList.add("hidden");
-  loading.classList.remove("hidden");
-
-  setTimeout(() => {
-    loading.classList.add("hidden");
-
-    if (data) {
-      document.getElementById("awb").innerText = input;
-      document.getElementById("customer").innerText = data.customer;
-      document.getElementById("origin").innerText = data.origin;
-      document.getElementById("destination").innerText = data.destination;
-      document.getElementById("lastUpdate").innerText = data.lastUpdate;
-      document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
-
-      const awbImage = document.getElementById("awbImage");
-      if (input === "AWB56300") {
-        awbImage.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56300.jpg";
-        awbImage.classList.remove("hidden");
+  function highlightSteps(status) {
+    const mapping = {
+      "Order Received": 1,
+      "Dispatched": 2,
+      "In Transit": 3,
+      "Out for Delivery": 4,
+      "Delivered": 5
+    };
+    const current = mapping[status] || 3;
+    for (let i = 1; i <= current; i++) {
+      const s = document.getElementById("step" + i);
+      if (i < current) {
+        s.classList.add("completed", "bg-green-600", "text-white");
       } else {
-        awbImage.classList.add("hidden");
+        s.classList.add("active");
       }
-
-      data.history.forEach((h, i) => {
-        const historyEl = document.getElementById("history" + (i + 1));
-        if (historyEl) historyEl.innerText = h;
-      });
-
-      if (data.status === "In Transit" || data.status === "Out for Delivery") {
-        notice.classList.remove("hidden");
-      }
-
-      box.classList.remove("hidden");
-      resetSteps();
-      highlightSteps(data.status);
-    } else {
-      err.classList.remove("hidden");
     }
-  }, 1000);
-}
-</script>
+  }
 
-<!-- Scroll to Top Button -->
-<button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" 
-class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-50">
+  function trackShipment() {
+    const input = document.getElementById("trackingInput").value.trim().toUpperCase();
+    const data = shipments[input];
+    const box = document.getElementById("trackingResult");
+    const err = document.getElementById("error");
+    const loading = document.getElementById("loadingOverlay");
+    const notice = document.getElementById("deliveryNotice");
+    const awbImage = document.getElementById("awbImage");
+
+    box.classList.add("hidden");
+    err.classList.add("hidden");
+    notice.classList.add("hidden");
+    loading.classList.remove("hidden");
+
+    setTimeout(() => {
+      loading.classList.add("hidden");
+
+      if (data) {
+        document.getElementById("awb").innerText = input;
+        document.getElementById("customer").innerText = data.customer;
+        document.getElementById("origin").innerText = data.origin;
+        document.getElementById("destination").innerText = data.destination;
+        document.getElementById("lastUpdate").innerText = data.lastUpdate;
+        document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
+
+        // Image logic
+        if (input === "AWB56300") {
+          awbImage.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56300.jpg";
+          awbImage.classList.remove("hidden");
+        } else if (input === "AWB56200") {
+          awbImage.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56200.jpg";
+          awbImage.classList.remove("hidden");
+        } else {
+          awbImage.classList.add("hidden");
+        }
+
+        // Timeline history
+        data.history.forEach((h, i) => {
+          const historyEl = document.getElementById("history" + (i + 1));
+          if (historyEl) historyEl.innerText = h;
+        });
+
+        if (data.status === "In Transit" || data.status === "Out for Delivery") {
+          notice.classList.remove("hidden");
+        }
+
+        box.classList.remove("hidden");
+        resetSteps();
+        highlightSteps(data.status);
+      } else {
+        err.classList.remove("hidden");
+      }
+    }, 1000);
+  }
+  </script>
+  <!-- Scroll to Top Button -->
+<button onclick="window.scrollTo({top: 0, behavior: 'smooth'});"
+  class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-50">
   ↑
 </button>
 
@@ -254,7 +259,7 @@ class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-l
   </button>
 </div>
 
-<!-- Footer Bar -->
+<!-- Footer -->
 <footer class="bg-orange-600 text-white text-center py-3 text-xs mt-6">
   Privacy Policy | Terms & Conditions | Contact | Support | Courier Details
 </footer>
@@ -271,9 +276,9 @@ class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-l
       <p>Privacy Policy | Terms & Conditions | Support</p>
     </div>
     <div class="flex gap-4 mt-2">
-      <img src="https://img.icons8.com/fluency/24/facebook-new.png"/>
-      <img src="https://img.icons8.com/fluency/24/twitter.png"/>
-      <img src="https://img.icons8.com/fluency/24/instagram-new.png"/>
+      <img src="https://img.icons8.com/fluency/24/facebook-new.png" alt="fb" />
+      <img src="https://img.icons8.com/fluency/24/twitter.png" alt="twitter" />
+      <img src="https://img.icons8.com/fluency/24/instagram-new.png" alt="insta" />
     </div>
   </div>
 </footer>
@@ -314,4 +319,5 @@ class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-l
 </section>
 
 </body>
-</html>
+          </html>
+          
