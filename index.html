@@ -68,11 +68,7 @@
       detectRetina: true
     });
   </script>
-</head>
-
-<body class="bg-orange-50 font-['Inter']">
-
-<!-- Loading Overlay -->
+  <!-- Loading Overlay -->
 <div id="loadingOverlay" class="fixed inset-0 bg-white bg-opacity-90 flex flex-col items-center justify-center z-50 hidden">
   <img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png" alt="Courier loading" class="w-20 h-20 animate-bounce mb-4">
   <p class="text-orange-600 font-semibold">Fetching your shipment details...</p>
@@ -115,7 +111,6 @@
       <p><strong>Last Updated:</strong> <span id="lastUpdate"></span></p>
       <p><strong>Expected Delivery:</strong> <span id="expectedDelivery"></span></p>
     </div>
-
     <div id="deliveryNotice" class="mt-6 hidden text-center text-sm font-semibold text-white bg-orange-500 p-3 rounded animate-glow animate-pulse">
       🚚 Delivery Partner Assigned: +91 22 6809 1958 (Share OTP 56292)
     </div>
@@ -139,84 +134,71 @@
 
   <div id="error" class="mt-4 text-red-600 hidden">Tracking ID not found. Please check and try again.</div>
 </section>
+
 <script>
-  const shipments = {
-    "AWB56200": {
-      customer: "Sujata Kurle",
-      origin: "PNQ Motherhub - 42(IN)",
-      destination: "Thane",
-      status: "Out for Delivery",
-      lastUpdate: "2025-07-27 13:46",
-      expectedDelivery: "2025-07-29",
-      history: [
-        "2025-07-18 09:00 · Order Received at PNQ",
-        "2025-07-18 18:45 · Dispatched from PNQ Motherhub",
-        "2025-07-27 13:46 · Out For Delivery (Delivery HUB)"
-      ]
-    },
-    "AWB56300": {
-      customer: "Mandar Rangole",
-      origin: "PNQ Motherhub - 42(IN)",
-      destination: "Ulwe, Navi Mumbai",
-      status: "Out for Delivery",
-      lastUpdate: "2025-07-27 13:46",
-      expectedDelivery: "2025-07-29",
-      history: [
-        "2025-07-18 09:00 · Order Received at PNQ",
-        "2025-07-18 18:45 · Dispatched from PNQ Motherhub",
-        "2025-07-27 13:46 · Out For Delivery (Delivery HUB)"
-      ]
-    }
+const shipments = {
+  "AWB56300": {
+    customer: "Mandar Rangole",
+    origin: "PNQ Motherhub - 42(IN)",
+    destination: "Ulwe, Navi Mumbai",
+    status: "Out for Delivery",
+    lastUpdate: "2025-07-27 13:46",
+    expectedDelivery: "2025-07-29",
+    history: [
+      "2025-07-18 09:00 · Order Received at PNQ",
+      "2025-07-18 18:45 · Dispatched from PNQ Motherhub",
+      "2025-07-27 13:46 · Out For Delivery (Delivery HUB)"
+    ]
+  },
+  "AWB56200": {
+    customer: "Sujata Kurle",
+    origin: "PNQ Motherhub - 42(IN)",
+    destination: "Thane",
+    status: "Out for Delivery",
+    lastUpdate: "2025-07-27 13:46",
+    expectedDelivery: "2025-07-29",
+    history: [
+      "2025-07-18 09:00 · Order Received at PNQ",
+      "2025-07-18 18:45 · Dispatched from PNQ Motherhub",
+      "2025-07-27 13:46 · Out For Delivery (Delivery HUB)"
+    ]
+  }
+};
+
+function resetSteps() {
+  for (let i = 1; i <= 5; i++) {
+    const s = document.getElementById("step" + i);
+    s.className = "step p-3 rounded";
+  }
+}
+
+function highlightSteps(status) {
+  const mapping = {
+    "Order Received": 1,
+    "Dispatched": 2,
+    "In Transit": 3,
+    "Out for Delivery": 4,
+    "Delivered": 5
   };
-
-  function resetSteps() {
-    for (let i = 1; i <= 5; i++) {
-      const s = document.getElementById("step" + i);
-      s.className = "step p-3 rounded";
+  const current = mapping[status] || 3;
+  for (let i = 1; i <= current; i++) {
+    const s = document.getElementById("step" + i);
+    if (i < current) {
+      s.classList.add("completed", "bg-green-600", "text-white");
+    } else {
+      s.classList.add("active");
     }
   }
+}
+  function trackShipment() {
+  const input = document.getElementById("trackingInput").value.trim().toUpperCase();
+  const data = shipments[input];
+  const box = document.getElementById("trackingResult");
+  const err = document.getElementById("error");
+  const loading = document.getElementById("loadingOverlay");
+  const notice = document.getElementById("deliveryNotice");
 
-  function highlightSteps(status) {
-    const mapping = {
-      "Order Received": 1,
-      "Dispatched": 2,
-      "In Transit": 3,
-      "Out for Delivery": 4,
-      "Delivered": 5
-    };
-    const current = mapping[status] || 3;
-    for (let i = 1; i <= current; i++) {
-      const s = document.getElementById("step" + i);
-      if (i < current) {
-        s.classList.add("completed", "bg-green-600", "text-white");
-      } else {
-        s.classList.add("active");
-      }
-    }
-  }
-function trackShipment() {
-
-</script>
-<!-- Scroll to Top Button -->
-<button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" 
-class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-50">
-  ↑
-</button>
-
-<!-- Floating Help Assistant -->
-<div class="fixed bottom-16 right-6 z-50">
-  <button class="bg-orange-600 text-white px-4 py-2 rounded-full shadow-lg text-sm hover:bg-orange-700 transition-all">
-    💬 Need Help?
-  </button>
-</div>
-
-<!-- Footer Bar -->
-<footer class="bg-orange-600 text-white text-center py-3 text-xs mt-6">
-  Privacy Policy | Terms & Conditions | Contact | Support | Courier Details
-</footer>
-  
-  <script>
-function trackShipment() {
+  box.classList.add("hidden");
   err.classList.add("hidden");
   notice.classList.add("hidden");
   loading.classList.remove("hidden");
@@ -257,6 +239,25 @@ function trackShipment() {
     }
   }, 1000);
 }
+</script>
+
+<!-- Scroll to Top Button -->
+<button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" 
+class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-50">
+  ↑
+</button>
+
+<!-- Floating Help Assistant -->
+<div class="fixed bottom-16 right-6 z-50">
+  <button class="bg-orange-600 text-white px-4 py-2 rounded-full shadow-lg text-sm hover:bg-orange-700 transition-all">
+    💬 Need Help?
+  </button>
+</div>
+
+<!-- Footer Bar -->
+<footer class="bg-orange-600 text-white text-center py-3 text-xs mt-6">
+  Privacy Policy | Terms & Conditions | Contact | Support | Courier Details
+</footer>
 
 <!-- Extended Footer -->
 <footer class="bg-white border-t border-orange-200 mt-16 pt-6 pb-10 px-4 text-center text-sm text-gray-600">
@@ -311,5 +312,6 @@ function trackShipment() {
     </form>
   </div>
 </section>
+
 </body>
 </html>
