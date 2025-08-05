@@ -3,36 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Track packages and manage courier deliveries with Credit Plus Couriers. Secure, fast, and reliable logistics solutions.">
-  <meta name="keywords" content="courier, delivery, tracking, logistics, shipping, parcel, AWB">
-  <meta name="author" content="Credit Plus Couriers">
   <title>Credit Plus Couriers</title>
+  <meta name="description" content="Secure package tracking with Credit Plus Couriers.">
   <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAIEEyDEBQRd8sgKRwLDTi02YHzmE2tgiBIA&s" type="image/png">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.11.1/tsparticles.bundle.min.js"></script>
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Inter', sans-serif;
       background: linear-gradient(180deg, #fffdfb 0%, #ffe7d4 100%);
       background-attachment: fixed;
       scroll-behavior: smooth;
-    }
-    .scrolling-notice {
-      background: #c53030;
-      color: white;
-      padding: 8px;
-      text-align: center;
-      font-weight: bold;
-      animation: marquee 10s linear infinite, pulse 1.5s infinite;
-    }
-    @keyframes marquee {
-      0% { transform: translateX(100%);}
-      100% { transform: translateX(-100%);}
-    }
-    @keyframes pulse {
-      0%,100% { opacity:1 }
-      50% { opacity:0.5 }
     }
     .step.active { background-color: #ed8936; color: white; }
     .step.completed::before { content: '✔'; margin-right: 4px; color: white; }
@@ -44,112 +27,95 @@
       50% { box-shadow: 0 0 20px #ff7300; }
       100% { box-shadow: 0 0 5px #ffa94d; }
     }
-    #deliveryMessage {
-      color: #ed8936;
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
   </style>
 </head>
 <body class="bg-orange-50 font-['Inter']">
-<!-- Particle Background -->
-<script src="https://cdn.jsdelivr.net/npm/tsparticles@2.11.1/tsparticles.bundle.min.js"></script>
-<div id="tsparticles" class="fixed inset-0 -z-10"></div>
-<script>
-  tsParticles.load("tsparticles", {
-    fullScreen: { enable: false },
-    background: { color: "#fff" },
-    particles: {
-      number: { value: 40 },
-      color: { value: ["#ffa94d", "#ff6700", "#ffae42"] },
-      shape: { type: "circle" },
-      opacity: { value: 0.5 },
-      size: { value: 4 },
-      move: { enable: true, speed: 1, direction: "none", outModes: "bounce" }
-    },
-    interactivity: {
-      events: { onHover: { enable: true, mode: "repulse" }, resize: true },
-      modes: { repulse: { distance: 100 } }
-    },
-    detectRetina: true
-  });
-</script>
+  <div id="tsparticles" class="fixed inset-0 -z-10"></div>
+  <script>
+    tsParticles.load("tsparticles", {
+      fullScreen: { enable: false },
+      background: { color: "#fff" },
+      particles: {
+        number: { value: 40 },
+        color: { value: ["#ffa94d", "#ff6700", "#ffae42"] },
+        shape: { type: "circle" },
+        opacity: { value: 0.5 },
+        size: { value: 4 },
+        move: { enable: true, speed: 1 }
+      },
+      interactivity: {
+        events: { onHover: { enable: true, mode: "repulse" }, resize: true },
+        modes: { repulse: { distance: 100 } }
+      },
+      detectRetina: true
+    });
+  </script>
 
-<!-- Loading Overlay -->
-<div id="loadingOverlay" class="fixed inset-0 bg-white bg-opacity-90 flex flex-col items-center justify-center z-50 hidden">
-  <img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png" alt="Courier loading" class="w-20 h-20 animate-bounce mb-4">
-  <p class="text-orange-600 font-semibold">Fetching your shipment details...</p>
-</div>
-
-<!-- Header -->
-<header class="bg-orange-600 text-white p-4 shadow">
-  <div class="max-w-6xl mx-auto flex items-center justify-between">
-    <div class="flex items-center gap-4">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAIEEyDEBQRd8sgKRwLDTi02YHzmE2tgiBIA&s" alt="Logo" class="h-12 object-contain max-w-[160px]">
-      <h1 class="text-xs font-bold">Credit Plus Couriers</h1>
+  <!-- Header -->
+  <header class="bg-orange-600 text-white p-4 shadow">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAIEEyDEBQRd8sgKRwLDTi02YHzmE2tgiBIA&s" alt="Logo" class="h-12 object-contain max-w-[160px]">
+        <h1 class="text-xs font-bold">Credit Plus Couriers</h1>
+      </div>
+      <a href="#tracking" class="bg-white text-orange-600 px-4 py-2 rounded hover:bg-orange-100 font-semibold">Track Package</a>
     </div>
-    <a href="#tracking" class="bg-white text-orange-600 px-4 py-2 rounded hover:bg-orange-100 font-semibold">Track Your Package</a>
-  </div>
-</header>
+  </header>
 
-<!-- Hero Section -->
-<section class="text-center py-16 px-4 bg-gradient-to-r from-orange-100 to-white">
-  <h2 class="text-xs font-bold text-orange-600 mb-4">Reliable, Fast & Secure Deliveries</h2>
-  <p class="text-xs mb-6">We deliver your parcels safely across the country. Enter your AWB number to track your shipment.</p>
-  <a href="#tracking" class="inline-block bg-orange-500 text-white px-6 py-3 rounded shadow-lg text-xs hover:bg-orange-600 transition">Track Your Package</a>
-</section>
+  <!-- Hero Section -->
+  <section class="text-center py-16 px-4 bg-gradient-to-r from-orange-100 to-white">
+    <h2 class="text-xs font-bold text-orange-600 mb-4">Reliable, Fast & Secure Deliveries</h2>
+    <p class="text-xs mb-6">We deliver your parcels safely across India. Enter your AWB number to track.</p>
+    <a href="#tracking" class="inline-block bg-orange-500 text-white px-6 py-3 rounded shadow-lg text-xs hover:bg-orange-600 transition">Track Now</a>
+  </section>
 
-<!-- Tracking Warning -->
-<div id="tracking" class="scrolling-notice">⚠️ IMPORTANT: Do not share OTP or personal details with unauthorized individuals.</div>
-<!-- Tracking Form Section -->
-<section class="max-w-xl mx-auto p-4 bg-white shadow-md rounded mt-6">
-  <h2 class="text-base font-semibold mb-4 text-orange-600">Track Your Shipment</h2>
-  <input id="trackingInput" type="text" placeholder="Enter AWB Number" class="w-full border p-3 rounded mb-4 focus:ring-orange-500" />
-  <button onclick="trackShipment()" class="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600">Track</button>
+  <!-- Tracking Section -->
+  <div id="tracking" class="scrolling-notice bg-red-600 text-white py-2 text-center font-bold animate-pulse">⚠️ Never share your OTP or Aadhar details with anyone.</div>
 
-  <div id="trackingResult" class="mt-6 hidden">
-    <div class="space-y-2 mb-4">
-      <img id="awbImage" src="" class="mb-4 rounded shadow-md w-full max-w-xs mx-auto hidden" />
-      <p><strong>AWB Number:</strong> <span id="awb"></span></p>
-      <p><strong>Customer Name:</strong> <span id="customer"></span></p>
-      <p><strong>Origin:</strong> <span id="origin"></span></p>
-      <p><strong>Destination:</strong> <span id="destination"></span></p>
-      <p><strong>Last Updated:</strong> <span id="lastUpdate"></span></p>
-      <p><strong>Expected Delivery:</strong> <span id="expectedDelivery"></span></p>
-    </div>
+  <section class="max-w-xl mx-auto p-4 bg-white shadow-md rounded mt-6">
+    <h2 class="text-base font-semibold mb-4 text-orange-600">Track Your Shipment</h2>
+    <input id="trackingInput" type="text" placeholder="Enter AWB Number" class="w-full border p-3 rounded mb-4 focus:ring-orange-500" />
+    <button onclick="trackShipment()" class="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600">Track</button>
+<div id="trackingResult" class="mt-6 hidden">
+      <div class="space-y-2 mb-4 text-sm">
+        <img id="awbImage" src="" class="mb-4 rounded shadow-md w-full max-w-xs mx-auto hidden" />
+        <p><strong>AWB Number:</strong> <span id="awb"></span></p>
+        <p><strong>Customer Name:</strong> <span id="customer"></span></p>
+        <p><strong>Origin:</strong> <span id="origin"></span></p>
+        <p><strong>Destination:</strong> <span id="destination"></span></p>
+        <p><strong>Last Updated:</strong> <span id="lastUpdate"></span></p>
+        <p><strong>Expected Delivery:</strong> <span id="expectedDelivery"></span></p>
+      </div>
 
-    <div id="arrivalMessage" class="text-center text-sm font-bold text-orange-600 mb-4 hidden">
-      🚚 Arriving On 6 August By 12 PM
-    </div>
+      <div class="text-center text-orange-600 font-bold text-sm mb-3 animate-pulse">
+        🚚 Arriving On 6 August By 12 PM
+      </div>
 
-    <div id="mapContainer" class="mb-6 hidden">
-      <h4 class="font-semibold text-orange-600 text-sm mb-2">Delivery Route Map</h4>
-      <img id="mapImage" src="" alt="Map" class="w-full max-w-md mx-auto rounded shadow" />
-    </div>
+      <div id="deliveryNotice" class="mt-6 hidden text-center text-sm font-semibold text-white bg-orange-500 p-3 rounded animate-glow">
+        🚛 Delivery Partner Assigned: +91 22 6809 1958 (Share OTP 56292)
+      </div>
 
-    <div id="deliveryNotice" class="mt-6 hidden text-center text-sm font-semibold text-white bg-orange-500 p-3 rounded animate-glow animate-pulse">
-      🚚 Delivery Partner Assigned: +91 22 6809 1958 (Share OTP 56292)
-    </div>
+      <div id="map" class="my-6 h-64 rounded shadow" style="height: 300px;"></div>
 
-    <h4 class="font-semibold text-orange-600 mb-2">Shipment Timeline</h4>
-    <div class="flex flex-col gap-3 mb-4">
-      <div class="step p-3 rounded" id="step1">Order Received</div>
-      <div class="step p-3 rounded" id="step2">Dispatched from Origin</div>
-      <div class="step p-3 rounded" id="step3">In Transit</div>
-      <div class="step p-3 rounded" id="step4">Out for Delivery</div>
-      <div class="step p-3 rounded" id="step5">Delivered</div>
+      <h4 class="font-semibold text-orange-600 mb-2">Shipment Timeline</h4>
+      <div class="flex flex-col gap-3 mb-4 text-sm">
+        <div class="step p-3 rounded bg-gray-100" id="step1">Order Received</div>
+        <div class="step p-3 rounded bg-gray-100" id="step2">Dispatched from Origin</div>
+        <div class="step p-3 rounded bg-gray-100" id="step3">In Transit</div>
+        <div class="step p-3 rounded bg-gray-100" id="step4">Out for Delivery</div>
+        <div class="step p-3 rounded bg-gray-100" id="step5">Delivered</div>
+      </div>
+
+      <h4 class="font-semibold text-orange-600 mb-2">Shipment History</h4>
+      <ul class="list-disc list-inside text-xs text-gray-700 space-y-1">
+        <li id="history1"></li>
+        <li id="history2"></li>
+        <li id="history3"></li>
+      </ul>
     </div>
 
-    <h4 class="font-semibold text-orange-600 mb-2">Shipment History</h4>
-    <ul class="list-disc list-inside text-xs text-gray-700 space-y-1">
-      <li id="history1"></li>
-      <li id="history2"></li>
-      <li id="history3"></li>
-    </ul>
-  </div>
-
-  <div id="error" class="mt-4 text-red-600 hidden">Tracking ID not found. Please check and try again.</div>
-</section>
+    <div id="error" class="mt-4 text-red-600 hidden">Tracking ID not found. Please check and try again.</div>
+  </section>
 <script>
   const shipments = {
     "AWB56200": {
@@ -157,37 +123,44 @@
       origin: "PNQ Motherhub - 42(IN)",
       destination: "Thane",
       status: "Out for Delivery",
-      lastUpdate: "2025-07-27 13:46",
-      expectedDelivery: "2025-07-29",
+      lastUpdate: "2025-08-04 14:22",
+      expectedDelivery: "2025-08-06",
       history: [
         "2025-07-18 09:00 · Order Received at PNQ",
         "2025-07-18 18:45 · Dispatched from PNQ Motherhub",
-        "2025-07-27 13:46 · Out For Delivery (Delivery HUB)"
+        "2025-08-04 14:22 · Out For Delivery (Delivery HUB)"
       ],
       image: "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56200.jpg",
-      map: "https://maps.googleapis.com/maps/api/staticmap?size=600x300&markers=Our+Facility|Sujata's+Home&key=YOUR_API_KEY"
+      map: {
+        from: [18.5204, 73.8567], // Our Facility (Pune)
+        to: [19.2183, 72.9781]    // Sujata's Home (Thane)
+      }
     },
     "AWB56300": {
       customer: "Mandar Rangole",
       origin: "PNQ Motherhub - 42(IN)",
       destination: "Ulwe, Navi Mumbai",
       status: "Out for Delivery",
-      lastUpdate: "2025-07-27 13:46",
-      expectedDelivery: "2025-07-29",
+      lastUpdate: "2025-08-04 14:22",
+      expectedDelivery: "2025-08-06",
       history: [
         "2025-07-18 09:00 · Order Received at PNQ",
         "2025-07-18 18:45 · Dispatched from PNQ Motherhub",
-        "2025-07-27 13:46 · Out For Delivery (Delivery HUB)"
+        "2025-08-04 14:22 · Out For Delivery (Delivery HUB)"
       ],
       image: "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56300.jpg",
-      map: "https://maps.googleapis.com/maps/api/staticmap?size=600x300&markers=Our+Facility|Mandar's+Home&key=YOUR_API_KEY"
+      map: {
+        from: [18.5204, 73.8567], // Our Facility (Pune)
+        to: [18.9296, 73.0413]    // Mandar's Home (Ulwe)
+      }
     }
   };
 
   function resetSteps() {
     for (let i = 1; i <= 5; i++) {
       const s = document.getElementById("step" + i);
-      s.className = "step p-3 rounded";
+      s.className = "step p-3 rounded bg-gray-100";
+      s.classList.remove("completed", "active", "bg-green-600", "text-white");
     }
   }
 
@@ -205,7 +178,7 @@
       if (i < current) {
         s.classList.add("completed", "bg-green-600", "text-white");
       } else {
-        s.classList.add("active");
+        s.classList.add("active", "bg-orange-500", "text-white");
       }
     }
   }
@@ -217,16 +190,10 @@
     const err = document.getElementById("error");
     const loading = document.getElementById("loadingOverlay");
     const notice = document.getElementById("deliveryNotice");
-    const arrival = document.getElementById("arrivalMessage");
-    const mapBox = document.getElementById("mapContainer");
-    const mapImg = document.getElementById("mapImage");
-    const img = document.getElementById("awbImage");
 
     box.classList.add("hidden");
     err.classList.add("hidden");
     notice.classList.add("hidden");
-    arrival.classList.add("hidden");
-    mapBox.classList.add("hidden");
     loading.classList.remove("hidden");
 
     setTimeout(() => {
@@ -240,18 +207,10 @@
         document.getElementById("lastUpdate").innerText = data.lastUpdate;
         document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
 
-        // Show Image
+        const img = document.getElementById("awbImage");
         img.src = data.image;
         img.classList.remove("hidden");
 
-        // Show Map
-        mapImg.src = data.map;
-        mapBox.classList.remove("hidden");
-
-        // Show Bold Orange Message
-        arrival.classList.remove("hidden");
-
-        // Shipment History
         data.history.forEach((h, i) => {
           const el = document.getElementById("history" + (i + 1));
           if (el) el.innerText = h;
@@ -264,25 +223,28 @@
         box.classList.remove("hidden");
         resetSteps();
         highlightSteps(data.status);
+
+        if (window.map) window.map.remove();
+        window.map = L.map('map').setView(data.map.from, 9);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        L.marker(data.map.from).addTo(map).bindPopup("Our Facility").openPopup();
+        L.marker(data.map.to).addTo(map).bindPopup(input === "AWB56200" ? "Sujata's Home" : "Mandar's Home");
+
+        const route = L.polyline([data.map.from, data.map.to], { color: 'orange' }).addTo(map);
+        map.fitBounds(route.getBounds());
+
       } else {
         err.classList.remove("hidden");
       }
     }, 1000);
   }
 </script>
-<!-- Bold Arrival Message -->
-<div id="arrivalMessage" class="hidden text-center mt-6 font-bold text-orange-600 text-lg animate-pulse">
-  📦 Arriving On 6 August By 12 PM
-</div>
-
-<!-- Static Map Preview -->
-<div id="mapContainer" class="hidden mt-6 flex justify-center">
-  <img id="mapImage" src="" alt="Map" class="w-full max-w-md rounded shadow-md" />
-</div>
-
 <!-- Scroll to Top Button -->
 <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});"
-class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-50">
+  class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-50">
   ↑
 </button>
 
@@ -350,5 +312,11 @@ class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-l
       <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-md">Submit</button>
     </form>
   </div>
-    </section>
-          
+</section>
+
+<!-- Leaflet Map Script -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+</body>
+</html>
