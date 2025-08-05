@@ -214,22 +214,34 @@ window.trackShipment = function () {
     }
   }
 
-  function showMap(awb) {
-    let destination = "Sujata's Home";
-    if (awb === "AWB56300") destination = "Mandar's Home";
+function showMap(awb) {
+  let destinationCoords = [];
+  let destinationLabel = "";
 
-    const map = L.map('map').setView([19.2183, 73.1645], 9);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    L.marker([18.5204, 73.8567]).addTo(map)
-      .bindPopup("Our Facility").openPopup();
-
-    L.marker([19.2183, 73.1645]).addTo(map)
-      .bindPopup(destination);
+  if (awb === "AWB56200") {
+    destinationCoords = [19.272617, 72.961120]; // Sujata's Home (Thane)
+    destinationLabel = "Sujata's Home (Thane)";
+  } else if (awb === "AWB56300") {
+    destinationCoords = [18.9804, 73.0387]; // Mandar's Home (Ulwe)
+    destinationLabel = "Mandar's Home (Ulwe)";
   }
-};
+
+  const map = L.map("map").setView(destinationCoords, 12);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+
+  // Our Facility (Pune)
+  L.marker([18.5204, 73.8567])
+    .addTo(map)
+    .bindPopup("Our Facility")
+    .openPopup();
+
+  // Destination marker
+  L.marker(destinationCoords)
+    .addTo(map)
+    .bindPopup(destinationLabel);
+}
 </script>
 <!-- Static Map Container -->
 <div id="map" class="map-container my-4 rounded shadow-md w-full h-64 hidden"></div>
