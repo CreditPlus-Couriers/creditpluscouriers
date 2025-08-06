@@ -10,10 +10,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-  <!-- Leaflet Map CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
     body {
@@ -45,17 +46,15 @@
   </div>
 </header>
 
-<!-- Hero -->
+<!-- Hero Section -->
 <section class="text-center py-12 px-4 bg-gradient-to-r from-orange-100 to-white">
   <h2 class="text-lg font-semibold text-orange-600 mb-2">Fast, Safe & Reliable Deliveries</h2>
   <p class="text-xs mb-6">Track your shipment easily using your AWB number.</p>
   <a href="#tracking" class="bg-orange-500 text-white px-6 py-2 rounded hover:bg-orange-600">Track Package</a>
 </section>
 
-<!-- Alert -->
-<div id="tracking" class="bg-red-600 text-white p-2 text-center font-semibold">
-  ⚠️ Never share your OTP or personal delivery info with others.
-</div>
+<!-- Warning Bar -->
+<div id="tracking" class="bg-red-600 text-white p-2 text-center font-semibold">⚠️ Never share your OTP or personal delivery info with others.</div>
 
 <!-- Tracking Form -->
 <section class="max-w-xl mx-auto mt-6 p-4 bg-white shadow rounded">
@@ -63,7 +62,7 @@
   <input id="trackingInput" type="text" placeholder="Enter AWB Number" class="w-full border p-3 rounded mb-4 focus:ring-orange-500" />
   <button onclick="trackShipment()" class="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600">Track</button>
 
-  <!-- Result Box -->
+  <!-- Result Container -->
   <div id="trackingResult" class="hidden mt-6 space-y-4">
     <div class="space-y-1">
       <img id="awbImage" src="" class="mb-4 rounded shadow-md w-full max-w-xs mx-auto hidden" />
@@ -80,9 +79,10 @@
       🚚 Delivery Partner Assigned: +91 22 6809 1958 (Share OTP 56292)
     </div>
 
-    <!-- Map Box -->
+    <!-- Map -->
     <div id="map" class="w-full h-64 rounded shadow hidden"></div>
-<!-- Timeline -->
+
+    <!-- Timeline -->
     <h4 class="font-semibold text-orange-600">Shipment Timeline</h4>
     <div class="flex flex-col gap-2">
       <div id="step1" class="step p-2 rounded">Order Received</div>
@@ -101,17 +101,13 @@
     </ul>
   </div>
 
-  <!-- Error Box -->
+  <!-- Error -->
   <div id="error" class="mt-4 text-red-600 hidden">Tracking ID not found. Please check and try again.</div>
 </section>
-
-<!-- Leaflet Map JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBetwZ02ZccH8kfVPx7idT4kvwefwlDCGk",
@@ -120,8 +116,7 @@
     projectId: "creditplustracking",
     storageBucket: "creditplustracking.appspot.com",
     messagingSenderId: "751793033151",
-    appId: "1:751793033151:web:72e0535b4880bfd5ee5b0a",
-    measurementId: "G-3XWB0DWZNT"
+    appId: "1:751793033151:web:72e0535b4880bfd5ee5b0a"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -149,6 +144,7 @@
 
       const data = snapshot.val();
 
+      // Set shipment info
       document.getElementById("awb").innerText = input;
       document.getElementById("customer").innerText = data.customer;
       document.getElementById("origin").innerText = data.origin;
@@ -156,28 +152,34 @@
       document.getElementById("lastUpdate").innerText = data.lastUpdate;
       document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
 
-      if (input === "AWB56300") {
-        awbImg.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56300.jpg";
-        awbImg.classList.remove("hidden");
-      } else if (input === "AWB56200") {
+      // Image (optional)
+      if (input === "AWB56200") {
         awbImg.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56200.jpg";
+        awbImg.classList.remove("hidden");
+      } else if (input === "AWB56300") {
+        awbImg.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56300.jpg";
         awbImg.classList.remove("hidden");
       }
 
+      // Status steps
       resetSteps();
       highlightSteps(data.status);
 
+      // History
       document.getElementById("history1").innerText = data.history[0] || "";
       document.getElementById("history2").innerText = data.history[1] || "";
       document.getElementById("history3").innerText = data.history[2] || "";
 
+      // Show delivery notice
       if (["In Transit", "Out for Delivery"].includes(data.status)) {
         deliveryNotice.classList.remove("hidden");
       }
 
+      // Show map
       mapBox.classList.remove("hidden");
       showLiveMap(input, data);
 
+      // Show result
       resultBox.classList.remove("hidden");
     }).catch(err => {
       errorBox.innerText = "Error fetching tracking data.";
@@ -207,7 +209,7 @@
     }
   }
 </script>
-<!-- Animated Rider Logic -->
+<!-- Animated Map Script (Place before </body>) -->
 <script>
   let mapInstance = null;
   let riderMarker = null;
@@ -219,17 +221,19 @@
     const destinationCoords = [data.lat, data.lng];
     const riderCoords = data.rider;
 
+    // Destroy previous map instance
     if (mapInstance) {
       mapInstance.remove();
       mapInstance = null;
     }
 
+    // Init new map
     mapInstance = L.map("map").setView(facilityCoords, 9);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "&copy; OpenStreetMap contributors"
     }).addTo(mapInstance);
 
-    // Our Facility Marker
+    // Facility Marker
     facilityMarker = L.marker(facilityCoords)
       .addTo(mapInstance)
       .bindPopup("Our Facility")
@@ -240,19 +244,15 @@
       .addTo(mapInstance)
       .bindPopup(data.customer + "'s Location");
 
-    // Custom Scooter Icon
-    const scooterIcon = L.icon({
-      iconUrl: "https://cdn-icons-png.flaticon.com/512/888/888857.png",
-      iconSize: [40, 40],
-      iconAnchor: [20, 20],
-      popupAnchor: [0, -20],
-    });
+    // Rider Marker
+    riderMarker = L.circleMarker([riderCoords.lat, riderCoords.lng], {
+      radius: 10,
+      color: "orange",
+      fillColor: "#ffa94d",
+      fillOpacity: 1
+    }).addTo(mapInstance);
 
-    // Rider Marker with Scooter Icon (starts from facility)
-    riderMarker = L.marker(facilityCoords, { icon: scooterIcon }).addTo(mapInstance);
-
-    // Animate Rider from Facility to Destination
-    animateRider(facilityCoords[0], facilityCoords[1], destinationCoords[0], destinationCoords[1]);
+    animateRider(riderCoords.lat, riderCoords.lng, destinationCoords[0], destinationCoords[1]);
   }
 
   function animateRider(startLat, startLng, endLat, endLng) {
@@ -276,110 +276,86 @@
     moveStep();
   }
 </script>
-<script type="module">
-// Firebase Config
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+<!-- Testimonials Section -->
+<section class="bg-orange-50 py-12 mt-12">
+  <div class="max-w-5xl mx-auto px-4">
+    <h2 class="text-2xl font-bold text-center text-orange-700 mb-8">Customer Testimonials</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <p class="text-gray-700 italic">"Smooth delivery process and great updates!"</p>
+        <p class="mt-2 text-sm font-semibold text-orange-600">– Rajiv D.</p>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <p class="text-gray-700 italic">"Arrived on time, very happy with the tracking."</p>
+        <p class="mt-2 text-sm font-semibold text-orange-600">– Neha S.</p>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <p class="text-gray-700 italic">"Support helped me reroute smoothly."</p>
+        <p class="mt-2 text-sm font-semibold text-orange-600">– Karan P.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-// Firebase Setup
-const firebaseConfig = {
-  apiKey: "AIzaSyBetwZ02ZccH8kfVPx7idT4kvwefwlDCGk",
-  authDomain: "creditplustracking.firebaseapp.com",
-  databaseURL: "https://creditplustracking-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "creditplustracking",
-  storageBucket: "creditplustracking.appspot.com",
-  messagingSenderId: "751793033151",
-  appId: "1:751793033151:web:72e0535b4880bfd5ee5b0a",
-  measurementId: "G-3XWB0DWZNT"
-};
+<!-- Raise a Request Form -->
+<section class="py-12 bg-white border-t border-gray-200 mt-8">
+  <div class="max-w-3xl mx-auto px-4">
+    <h2 class="text-2xl font-bold text-center text-orange-700 mb-6">Raise a Request</h2>
+    <form class="space-y-4">
+      <input type="text" placeholder="Your Name"
+        class="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-orange-400" required />
+      <input type="email" placeholder="Your Email"
+        class="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-orange-400" required />
+      <input type="text" placeholder="AWB Number (if any)" class="w-full border rounded-md p-2" />
+      <textarea placeholder="Describe your issue or request..." rows="4"
+        class="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-orange-400"></textarea>
+      <button type="submit"
+        class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-md">Submit</button>
+    </form>
+  </div>
+</section>
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+<!-- Footer Bar -->
+<footer class="bg-orange-600 text-white text-center py-3 text-xs mt-6">
+  Privacy Policy | Terms & Conditions | Contact | Support | Courier Details
+</footer>
 
-window.trackShipment = function () {
-  const input = document.getElementById("trackingInput").value.trim().toUpperCase();
-  const resultBox = document.getElementById("trackingResult");
-  const errorBox = document.getElementById("error");
-  const awbImg = document.getElementById("awbImage");
-  const mapBox = document.getElementById("map");
-  const deliveryNotice = document.getElementById("deliveryNotice");
+<!-- Extended Footer -->
+<footer class="bg-white border-t border-orange-200 pt-6 pb-10 px-4 text-center text-sm text-gray-600">
+  <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
+    <div>
+      <p><strong>Contact Us:</strong> support@creditpluscouriers.com</p>
+      <p>📍 Pune HQ</p>
+    </div>
+    <div>
+      <p><strong>Quick Links</strong></p>
+      <p>Privacy Policy | Terms & Conditions | Support</p>
+    </div>
+    <div class="flex gap-4 mt-2">
+      <img src="https://img.icons8.com/fluency/24/facebook-new.png" />
+      <img src="https://img.icons8.com/fluency/24/twitter.png" />
+      <img src="https://img.icons8.com/fluency/24/instagram-new.png" />
+    </div>
+  </div>
+</footer>
 
-  resultBox.classList.add("hidden");
-  errorBox.classList.add("hidden");
-  awbImg.classList.add("hidden");
-  deliveryNotice.classList.add("hidden");
-  mapBox.classList.add("hidden");
+<!-- Floating Help Assistant -->
+<div class="fixed bottom-16 right-6 z-50">
+  <button class="bg-orange-600 text-white px-4 py-2 rounded-full shadow-lg text-sm hover:bg-orange-700 transition-all">
+    💬 Need Help?
+  </button>
+</div>
 
-  get(child(ref(db), `shipments/${input}`)).then(snapshot => {
-    if (!snapshot.exists()) {
-      errorBox.classList.remove("hidden");
-      return;
-    }
+<!-- Scroll to Top Button -->
+<button onclick="window.scrollTo({ top: 0, behavior: 'smooth' });"
+  class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-50">
+  ↑
+</button>
+<!-- Leaflet CSS and JS (already included in head, but safe to repeat here if needed) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    const data = snapshot.val();
-
-    // Populate shipment info
-    document.getElementById("awb").innerText = input;
-    document.getElementById("customer").innerText = data.customer;
-    document.getElementById("origin").innerText = data.origin;
-    document.getElementById("destination").innerText = data.destination;
-    document.getElementById("lastUpdate").innerText = data.lastUpdate;
-    document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
-
-    // Show image
-    if (input === "AWB56300") {
-      awbImg.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56300.jpg";
-      awbImg.classList.remove("hidden");
-    } else if (input === "AWB56200") {
-      awbImg.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56200.jpg";
-      awbImg.classList.remove("hidden");
-    }
-
-    // Timeline and history
-    resetSteps();
-    highlightSteps(data.status);
-    document.getElementById("history1").innerText = data.history[0] || "";
-    document.getElementById("history2").innerText = data.history[1] || "";
-    document.getElementById("history3").innerText = data.history[2] || "";
-
-    // Delivery note
-    if (["In Transit", "Out for Delivery"].includes(data.status)) {
-      deliveryNotice.classList.remove("hidden");
-    }
-
-    // Map + Rider
-    mapBox.classList.remove("hidden");
-    showLiveMap(input, data);
-
-    resultBox.classList.remove("hidden");
-  }).catch(err => {
-    errorBox.innerText = "Error fetching tracking data.";
-    errorBox.classList.remove("hidden");
-  });
-
-  function resetSteps() {
-    for (let i = 1; i <= 5; i++) {
-      const s = document.getElementById("step" + i);
-      s.className = "step p-2 rounded";
-    }
-  }
-
-  function highlightSteps(status) {
-    const map = {
-      "Order Received": 1,
-      "Dispatched": 2,
-      "In Transit": 3,
-      "Out for Delivery": 4,
-      "Delivered": 5
-    };
-    const curr = map[status] || 1;
-    for (let i = 1; i <= curr; i++) {
-      const s = document.getElementById("step" + i);
-      s.classList.add(i === curr ? "active" : "completed");
-    }
-  }
-}
-</script>
+<!-- Firebase Live Map Script -->
 <script>
   let mapInstance = null;
   let riderMarker = null;
@@ -391,7 +367,6 @@ window.trackShipment = function () {
     const destinationCoords = [data.lat, data.lng];
     const riderCoords = data.rider;
 
-    // Destroy old map
     if (mapInstance) {
       mapInstance.remove();
       mapInstance = null;
@@ -402,41 +377,28 @@ window.trackShipment = function () {
       attribution: "&copy; OpenStreetMap contributors"
     }).addTo(mapInstance);
 
-    // Facility marker
     facilityMarker = L.marker(facilityCoords)
       .addTo(mapInstance)
       .bindPopup("Our Facility")
       .openPopup();
 
-    // Destination marker
     destinationMarker = L.marker(destinationCoords)
       .addTo(mapInstance)
       .bindPopup(data.customer + "'s Location");
 
-    // Custom scooter icon
-    const scooterIcon = L.icon({
-      iconUrl: "https://cdn-icons-png.flaticon.com/512/2972/2972185.png", // Scooter icon with rider
-      iconSize: [48, 48],
-      iconAnchor: [24, 24],
-      popupAnchor: [0, -20],
-    });
+    riderMarker = L.marker([riderCoords.lat, riderCoords.lng]).addTo(mapInstance);
 
-    // Rider marker
-    riderMarker = L.marker([facilityCoords[0], facilityCoords[1]], { icon: scooterIcon })
-      .addTo(mapInstance)
-      .bindPopup("Delivery Partner");
-
-    // Animate rider from facility to destination
-    animateRider(facilityCoords, destinationCoords);
+    animateRider(riderCoords.lat, riderCoords.lng, destinationCoords[0], destinationCoords[1]);
   }
 
-  function animateRider(start, end) {
-    let lat = start[0];
-    let lng = start[1];
+  function animateRider(startLat, startLng, endLat, endLng) {
+    let lat = startLat;
+    let lng = startLng;
     const steps = 100;
     let i = 0;
-    const latStep = (end[0] - start[0]) / steps;
-    const lngStep = (end[1] - start[1]) / steps;
+
+    const latStep = (endLat - startLat) / steps;
+    const lngStep = (endLng - startLng) / steps;
 
     function moveStep() {
       if (i >= steps) return;
@@ -450,3 +412,6 @@ window.trackShipment = function () {
     moveStep();
   }
 </script>
+
+</body>
+</html>
