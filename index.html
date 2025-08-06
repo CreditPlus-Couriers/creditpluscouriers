@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Track your shipment with Credit Plus Couriers. Secure, real-time delivery updates.">
   <title>Credit Plus Couriers</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Leaflet Map CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
     body {
@@ -44,7 +46,7 @@
     </div>
   </header>
 
-  <!-- Hero Section -->
+  <!-- Hero -->
   <section class="text-center py-12 px-4 bg-gradient-to-r from-orange-100 to-white">
     <h2 class="text-lg font-semibold text-orange-600 mb-2">Fast, Safe & Reliable Deliveries</h2>
     <p class="text-xs mb-6">Track your shipment easily using your AWB number.</p>
@@ -60,26 +62,27 @@
     <input id="trackingInput" type="text" placeholder="Enter AWB Number" class="w-full border p-3 rounded mb-4 focus:ring-orange-500" />
     <button onclick="trackShipment()" class="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600">Track</button>
 
-    <!-- Tracking Result (hidden by default) -->
+    <!-- Result -->
     <div id="trackingResult" class="hidden mt-6 space-y-4">
-      <img id="awbImage" src="" class="mb-4 rounded shadow-md w-full max-w-xs mx-auto hidden" />
-      <p><strong>AWB Number:</strong> <span id="awb"></span></p>
-      <p><strong>Customer:</strong> <span id="customer"></span></p>
-      <p><strong>Origin:</strong> <span id="origin"></span></p>
-      <p><strong>Destination:</strong> <span id="destination"></span></p>
-      <p><strong>Last Updated:</strong> <span id="lastUpdate"></span></p>
-      <p><strong>Expected Delivery:</strong> <span id="expectedDelivery"></span></p>
-      <p class="text-orange-600 font-semibold">📦 Arriving On 6 August By 12 PM</p>
-
-      <div id="deliveryNotice" class="bg-orange-500 text-white p-3 rounded text-center animate-glow hidden">
+      <div class="space-y-1">
+        <img id="awbImage" src="" class="mb-4 rounded shadow-md w-full max-w-xs mx-auto hidden" />
+        <p><strong>AWB Number:</strong> <span id="awb"></span></p>
+        <p><strong>Customer:</strong> <span id="customer"></span></p>
+        <p><strong>Origin:</strong> <span id="origin"></span></p>
+        <p><strong>Destination:</strong> <span id="destination"></span></p>
+        <p><strong>Last Updated:</strong> <span id="lastUpdate"></span></p>
+        <p><strong>Expected Delivery:</strong> <span id="expectedDelivery"></span></p>
+        <p class="text-orange-600 font-semibold">📦 Arriving On 6 August By 12 PM</p>
+      </div>
+<div id="deliveryNotice" class="bg-orange-500 text-white p-3 rounded text-center animate-glow hidden">
         🚚 Delivery Partner Assigned: +91 22 6809 1958 (Share OTP 56292)
       </div>
 
-      <!-- Map Container -->
+      <!-- Leaflet Map -->
       <div id="map" class="w-full h-64 rounded shadow hidden"></div>
 
-      <!-- Shipment Timeline -->
-      <h4 class="font-semibold text-orange-600">Shipment Timeline</h4>
+      <!-- Timeline -->
+      <h4 class="font-semibold text-orange-600 mt-6">Shipment Timeline</h4>
       <div class="flex flex-col gap-2">
         <div id="step1" class="step p-2 rounded">Order Received</div>
         <div id="step2" class="step p-2 rounded">Dispatched</div>
@@ -88,7 +91,7 @@
         <div id="step5" class="step p-2 rounded">Delivered</div>
       </div>
 
-      <!-- Shipment History -->
+      <!-- History -->
       <h4 class="font-semibold text-orange-600 mt-4">Shipment History</h4>
       <ul class="list-disc list-inside text-xs text-gray-700 space-y-1">
         <li id="history1"></li>
@@ -97,298 +100,314 @@
       </ul>
     </div>
 
-    <!-- Error Message -->
+    <!-- Error -->
     <div id="error" class="mt-4 text-red-600 hidden">Tracking ID not found. Please check and try again.</div>
   </section>
-<!-- Firebase & Leaflet JS -->
-<script type="module">
-  // Import Firebase SDK
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getDatabase, ref, get, child, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyBetwZ02ZccH8kfVPx7idT4kvwefwlDCGk",
-    authDomain: "creditplustracking.firebaseapp.com",
-    databaseURL: "https://creditplustracking-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "creditplustracking",
-    storageBucket: "creditplustracking.appspot.com",
-    messagingSenderId: "751793033151",
-    appId: "1:751793033151:web:72e0535b4880bfd5ee5b0a"
-  };
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, get, child, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-  // Init Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+    const firebaseConfig = {
+      apiKey: "AIzaSyBetwZ02ZccH8kfVPx7idT4kvwefwlDCGk",
+      authDomain: "creditplustracking.firebaseapp.com",
+      databaseURL: "https://creditplustracking-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "creditplustracking",
+      storageBucket: "creditplustracking.appspot.com",
+      messagingSenderId: "751793033151",
+      appId: "1:751793033151:web:72e0535b4880bfd5ee5b0a",
+      measurementId: "G-3XWB0DWZNT"
+    };
 
-  // Global rider marker
-  let riderMarker;
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-  // Track button logic
-  window.trackShipment = function () {
-    const input = document.getElementById("trackingInput").value.trim().toUpperCase();
-    const resultBox = document.getElementById("trackingResult");
-    const errorBox = document.getElementById("error");
-    const awbImg = document.getElementById("awbImage");
-    const mapBox = document.getElementById("map");
-    const deliveryNotice = document.getElementById("deliveryNotice");
+    window.trackShipment = function () {
+      const input = document.getElementById("trackingInput").value.trim().toUpperCase();
+      const resultBox = document.getElementById("trackingResult");
+      const errorBox = document.getElementById("error");
+      const awbImg = document.getElementById("awbImage");
+      const mapBox = document.getElementById("map");
+      const deliveryNotice = document.getElementById("deliveryNotice");
 
-    resultBox.classList.add("hidden");
-    errorBox.classList.add("hidden");
-    awbImg.classList.add("hidden");
-    deliveryNotice.classList.add("hidden");
-    mapBox.classList.add("hidden");
+      resultBox.classList.add("hidden");
+      errorBox.classList.add("hidden");
+      awbImg.classList.add("hidden");
+      deliveryNotice.classList.add("hidden");
+      mapBox.classList.add("hidden");
 
-    get(child(ref(db), `shipments/${input}`)).then(snapshot => {
-      if (!snapshot.exists()) {
+      get(child(ref(db), `shipments/${input}`)).then(snapshot => {
+        if (!snapshot.exists()) {
+          errorBox.classList.remove("hidden");
+          return;
+        }
+
+        const data = snapshot.val();
+
+        document.getElementById("awb").innerText = input;
+        document.getElementById("customer").innerText = data.customer;
+        document.getElementById("origin").innerText = data.origin;
+        document.getElementById("destination").innerText = data.destination;
+        document.getElementById("lastUpdate").innerText = data.lastUpdate;
+        document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
+
+        // Show image
+        if (input === "AWB56300") {
+          awbImg.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56300.jpg";
+          awbImg.classList.remove("hidden");
+        } else if (input === "AWB56200") {
+          awbImg.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56200.jpg";
+          awbImg.classList.remove("hidden");
+        }
+
+        resetSteps();
+        highlightSteps(data.status);
+
+        document.getElementById("history1").innerText = data.history[0] || "";
+        document.getElementById("history2").innerText = data.history[1] || "";
+        document.getElementById("history3").innerText = data.history[2] || "";
+
+        if (["In Transit", "Out for Delivery"].includes(data.status)) {
+          deliveryNotice.classList.remove("hidden");
+        }
+
+        mapBox.classList.remove("hidden");
+        loadMapWithRider(input, data);
+        resultBox.classList.remove("hidden");
+      }).catch(err => {
+        errorBox.innerText = "Error fetching tracking data.";
         errorBox.classList.remove("hidden");
-        return;
+      });
+
+      function resetSteps() {
+        for (let i = 1; i <= 5; i++) {
+          const s = document.getElementById("step" + i);
+          s.className = "step p-2 rounded";
+        }
       }
 
-      const data = snapshot.val();
-
-      document.getElementById("awb").innerText = input;
-      document.getElementById("customer").innerText = data.customer;
-      document.getElementById("origin").innerText = data.origin;
-      document.getElementById("destination").innerText = data.destination;
-      document.getElementById("lastUpdate").innerText = data.lastUpdate;
-      document.getElementById("expectedDelivery").innerText = data.expectedDelivery;
-
-      if (input === "AWB56300") {
-        awbImg.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56300.jpg";
-        awbImg.classList.remove("hidden");
-      } else if (input === "AWB56200") {
-        awbImg.src = "https://raw.githubusercontent.com/CreditPlus-Couriers/creditpluscouriers/main/awb56200.jpg";
-        awbImg.classList.remove("hidden");
+      function highlightSteps(status) {
+        const map = {
+          "Order Received": 1,
+          "Dispatched": 2,
+          "In Transit": 3,
+          "Out for Delivery": 4,
+          "Delivered": 5
+        };
+        const curr = map[status] || 1;
+        for (let i = 1; i <= curr; i++) {
+          const s = document.getElementById("step" + i);
+          s.classList.add(i === curr ? "active" : "completed");
+        }
       }
+    };
+  </script>
+<script>
+    let map, riderMarker, riderIcon;
 
-      // Timeline
-      resetSteps();
-      highlightSteps(data.status);
+    function loadMapWithRider(awb, data) {
+      if (map) map.remove();
 
-      // History
-      document.getElementById("history1").innerText = data.history[0] || "";
-      document.getElementById("history2").innerText = data.history[1] || "";
-      document.getElementById("history3").innerText = data.history[2] || "";
+      const destinationCoords = [data.lat, data.lng];
+      const facilityCoords = [18.5204, 73.8567]; // Pune
+      const riderCoords = [data.rider.lat, data.rider.lng];
 
-      // Show delivery partner note
-      if (["In Transit", "Out for Delivery"].includes(data.status)) {
-        deliveryNotice.classList.remove("hidden");
-      }
-
-      // Map logic
-      mapBox.classList.remove("hidden");
-      renderMap(data, input);
-
-      // Reveal result box
-      resultBox.classList.remove("hidden");
-    }).catch(err => {
-      errorBox.innerText = "Error fetching tracking data.";
-      errorBox.classList.remove("hidden");
-    });
-
-    function resetSteps() {
-      for (let i = 1; i <= 5; i++) {
-        const s = document.getElementById("step" + i);
-        s.className = "step p-2 rounded";
-      }
-    }
-
-    function highlightSteps(status) {
-      const map = {
-        "Order Received": 1,
-        "Dispatched": 2,
-        "In Transit": 3,
-        "Out for Delivery": 4,
-        "Delivered": 5
-      };
-      const curr = map[status] || 1;
-      for (let i = 1; i <= curr; i++) {
-        const s = document.getElementById("step" + i);
-        s.classList.add(i === curr ? "active" : "completed");
-      }
-    }
-
-    // MAP setup with Leaflet
-    function renderMap(data, awb) {
-      const destination = [data.lat, data.lng];
-      const source = [18.5204, 73.8567]; // Pune facility
-
-      const map = L.map("map").setView(destination, 11);
+      map = L.map("map").setView(riderCoords, 10);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "&copy; OpenStreetMap contributors"
       }).addTo(map);
 
-      L.marker(source).addTo(map).bindPopup("Our Facility").openPopup();
-      L.marker(destination).addTo(map).bindPopup("Destination");
+      L.marker(facilityCoords).addTo(map).bindPopup("Our Facility").openPopup();
+      L.marker(destinationCoords).addTo(map).bindPopup(`${data.customer}'s Home`);
 
-      // Rider marker with icon
-      const riderIcon = L.icon({
-        iconUrl: "https://cdn-icons-png.flaticon.com/512/685/685352.png",
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
+      riderIcon = L.icon({
+        iconUrl: "https://cdn-icons-png.flaticon.com/512/2967/2967492.png",
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
+        popupAnchor: [0, -20]
       });
 
-      riderMarker = L.marker([data.rider.lat, data.rider.lng], { icon: riderIcon }).addTo(map).bindPopup("Rider");
+      riderMarker = L.marker(riderCoords, { icon: riderIcon }).addTo(map).bindPopup("Delivery Rider");
 
-      // Live update rider
-      const riderRef = ref(db, `shipments/${awb}/rider`);
-      onValue(riderRef, snap => {
-        const rider = snap.val();
-        if (rider && riderMarker) {
-          riderMarker.setLatLng([rider.lat, rider.lng]);
+      // Realtime movement
+      const db = firebase.database();
+      firebase.database().ref(`shipments/${awb}/rider`).on("value", (snapshot) => {
+        const val = snapshot.val();
+        if (val) {
+          riderMarker.setLatLng([val.lat, val.lng]);
+          map.panTo([val.lat, val.lng]);
         }
       });
     }
-  };
-</script>
-<!-- Scroll to Top Button -->
-<button onclick="window.scrollTo({ top: 0, behavior: 'smooth' });"
-  class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-50">
-  ↑
-</button>
+  </script>
 
-<!-- Floating Help Assistant -->
-<div class="fixed bottom-16 right-6 z-50">
-  <button class="bg-orange-600 text-white px-4 py-2 rounded-full shadow-lg text-sm hover:bg-orange-700 transition-all">
-    💬 Need Help?
+  <!-- Static Map Style -->
+  <style>
+    #map {
+      height: 300px;
+      width: 100%;
+    }
+  </style>
+
+  <!-- Scroll to Top -->
+  <button onclick="window.scrollTo({ top: 0, behavior: 'smooth' });"
+    class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-50">
+    ↑
   </button>
-</div>
 
+  <!-- Floating Help -->
+  <div class="fixed bottom-16 right-6 z-50">
+    <button class="bg-orange-600 text-white px-4 py-2 rounded-full shadow-lg text-sm hover:bg-orange-700 transition-all">
+      💬 Need Help?
+    </button>
+  </div>
 <!-- Footer Bar -->
-<footer class="bg-orange-600 text-white text-center py-3 text-xs mt-6">
-  Privacy Policy | Terms & Conditions | Contact | Support | Courier Details
-</footer>
+  <footer class="bg-orange-600 text-white text-center py-3 text-xs mt-6">
+    Privacy Policy | Terms & Conditions | Contact | Support | Courier Details
+  </footer>
 
-<!-- Extended Footer -->
-<footer class="bg-white border-t border-orange-200 pt-6 pb-10 px-4 text-center text-sm text-gray-600">
-  <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
-    <div>
-      <p><strong>Contact Us:</strong> support@creditpluscouriers.com</p>
-      <p>📍 Pune HQ</p>
-    </div>
-    <div>
-      <p><strong>Quick Links</strong></p>
-      <p>Privacy Policy | Terms & Conditions | Support</p>
-    </div>
-    <div class="flex gap-4 mt-2">
-      <img src="https://img.icons8.com/fluency/24/facebook-new.png" alt="Facebook"/>
-      <img src="https://img.icons8.com/fluency/24/twitter.png" alt="Twitter"/>
-      <img src="https://img.icons8.com/fluency/24/instagram-new.png" alt="Instagram"/>
-    </div>
-  </div>
-</footer>
-
-<!-- Testimonials Section -->
-<section class="bg-orange-50 py-12 mt-12">
-  <div class="max-w-5xl mx-auto px-4">
-    <h2 class="text-2xl font-bold text-center text-orange-700 mb-8">Customer Testimonials</h2>
-    <div class="grid md:grid-cols-3 gap-6">
-      <div class="bg-white p-6 rounded-xl shadow-md">
-        <p class="text-gray-700 italic">"Smooth delivery process and great updates!"</p>
-        <p class="mt-2 text-sm font-semibold text-orange-600">– Rajiv D.</p>
+  <!-- Extended Footer -->
+  <footer class="bg-white border-t border-orange-200 pt-6 pb-10 px-4 text-center text-sm text-gray-600">
+    <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
+      <div>
+        <p><strong>Contact Us:</strong> support@creditpluscouriers.com</p>
+        <p>📍 Pune HQ</p>
       </div>
-      <div class="bg-white p-6 rounded-xl shadow-md">
-        <p class="text-gray-700 italic">"Arrived on time, very happy with the tracking."</p>
-        <p class="mt-2 text-sm font-semibold text-orange-600">– Neha S.</p>
+      <div>
+        <p><strong>Quick Links</strong></p>
+        <p>Privacy Policy | Terms & Conditions | Support</p>
       </div>
-      <div class="bg-white p-6 rounded-xl shadow-md">
-        <p class="text-gray-700 italic">"Support helped me reroute smoothly."</p>
-        <p class="mt-2 text-sm font-semibold text-orange-600">– Karan P.</p>
+      <div class="flex gap-4 mt-2">
+        <img src="https://img.icons8.com/fluency/24/facebook-new.png" />
+        <img src="https://img.icons8.com/fluency/24/twitter.png" />
+        <img src="https://img.icons8.com/fluency/24/instagram-new.png" />
       </div>
     </div>
-  </div>
-</section>
-<!-- Raise a Request Form -->
-<section class="py-12 bg-white border-t border-gray-200 mt-8">
-  <div class="max-w-3xl mx-auto px-4">
-    <h2 class="text-2xl font-bold text-center text-orange-700 mb-6">Raise a Request</h2>
-    <form class="space-y-4">
-      <input type="text" placeholder="Your Name"
-        class="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-orange-400" required />
-      <input type="email" placeholder="Your Email"
-        class="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-orange-400" required />
-      <input type="text" placeholder="AWB Number (if any)" class="w-full border rounded-md p-2" />
-      <textarea placeholder="Describe your issue or request..." rows="4"
-        class="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-orange-400"></textarea>
-      <button type="submit"
-        class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-md">Submit</button>
-    </form>
-  </div>
-</section>
+  </footer>
 
-<!-- Leaflet Map CSS & JS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- Firebase Live Rider Map Script -->
-<script>
-  function showMap(awb) {
-    let destinationCoords = [];
-    let destinationLabel = "";
-    let mapCenter = [18.5204, 73.8567]; // Default: Pune
+  <!-- Testimonials Section -->
+  <section class="bg-orange-50 py-12 mt-12">
+    <div class="max-w-5xl mx-auto px-4">
+      <h2 class="text-2xl font-bold text-center text-orange-700 mb-8">Customer Testimonials</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <p class="text-gray-700 italic">"Smooth delivery process and great updates!"</p>
+          <p class="mt-2 text-sm font-semibold text-orange-600">– Rajiv D.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <p class="text-gray-700 italic">"Arrived on time, very happy with the tracking."</p>
+          <p class="mt-2 text-sm font-semibold text-orange-600">– Neha S.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <p class="text-gray-700 italic">"Support helped me reroute smoothly."</p>
+          <p class="mt-2 text-sm font-semibold text-orange-600">– Karan P.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    if (awb === "AWB56200") {
-      destinationCoords = [19.272617, 72.961120]; // Sujata's Home (Thane)
-      destinationLabel = "Sujata's Home (Thane)";
-      mapCenter = destinationCoords;
-    } else if (awb === "AWB56300") {
-      destinationCoords = [18.9804, 73.0387]; // Mandar's Home (Ulwe)
-      destinationLabel = "Mandar's Home (Ulwe)";
-      mapCenter = destinationCoords;
+  <!-- Raise a Request Form -->
+  <section class="py-12 bg-white border-t border-gray-200 mt-8">
+    <div class="max-w-3xl mx-auto px-4">
+      <h2 class="text-2xl font-bold text-center text-orange-700 mb-6">Raise a Request</h2>
+      <form class="space-y-4">
+        <input type="text" placeholder="Your Name"
+          class="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-orange-400" required />
+        <input type="email" placeholder="Your Email"
+          class="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-orange-400" required />
+        <input type="text" placeholder="AWB Number (if any)" class="w-full border rounded-md p-2" />
+        <textarea placeholder="Describe your issue or request..." rows="4"
+          class="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-orange-400"></textarea>
+        <button type="submit"
+          class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-md">Submit</button>
+      </form>
+    </div>
+  </section>
+<!-- Rider + Destination Map Logic -->
+  <script>
+    let riderMarker = null;
+
+    function showMap(awb) {
+      let destinationCoords = [];
+      let destinationLabel = "";
+      let riderStart = [];
+
+      if (awb === "AWB56200") {
+        destinationCoords = [19.272617, 72.961120]; // Sujata (Thane)
+        destinationLabel = "Sujata's Home (Thane)";
+        riderStart = [19.2094, 72.9758];
+      } else if (awb === "AWB56300") {
+        destinationCoords = [18.9804, 73.0387]; // Mandar (Ulwe)
+        destinationLabel = "Mandar's Home (Ulwe)";
+        riderStart = [18.9904, 73.0505];
+      }
+
+      const map = L.map("map").setView(riderStart, 12);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors"
+      }).addTo(map);
+
+      // Source (Facility)
+      const facility = L.marker(riderStart).addTo(map).bindPopup("Our Facility");
+      facility.openPopup();
+
+      // Destination marker
+      L.marker(destinationCoords).addTo(map).bindPopup(destinationLabel);
+
+      // Scooter Icon
+      const scooterIcon = L.icon({
+        iconUrl: "https://cdn-icons-png.flaticon.com/512/2961/2961957.png",
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
+        popupAnchor: [0, -20]
+      });
+
+      // Add animated rider
+      riderMarker = L.marker(riderStart, { icon: scooterIcon }).addTo(map).bindPopup("Delivery Rider");
+
+      // Animate toward destination
+      animateRider(map, riderStart, destinationCoords);
     }
 
-    const map = L.map("map").setView(mapCenter, 11);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap contributors"
-    }).addTo(map);
+    function animateRider(map, from, to) {
+      const steps = 200;
+      let i = 0;
 
-    L.marker([18.5204, 73.8567])
-      .addTo(map)
-      .bindPopup("Our Facility (Pune)")
-      .openPopup();
+      const deltaLat = (to[0] - from[0]) / steps;
+      const deltaLng = (to[1] - from[1]) / steps;
 
-    L.marker(destinationCoords)
-      .addTo(map)
-      .bindPopup(destinationLabel);
+      const interval = setInterval(() => {
+        if (!riderMarker) return clearInterval(interval);
 
-    // Rider marker logic (real-time from Firebase)
-    const riderIcon = L.icon({
-      iconUrl: "https://cdn-icons-png.flaticon.com/128/7870/7870991.png",
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40]
-    });
+        const lat = from[0] + deltaLat * i;
+        const lng = from[1] + deltaLng * i;
 
-    const riderMarker = L.marker([0, 0], { icon: riderIcon }).addTo(map);
+        riderMarker.setLatLng([lat, lng]);
+        map.panTo([lat, lng]);
 
-    const riderRef = firebase.database().ref(`shipments/${awb}/rider`);
-    riderRef.on("value", (snapshot) => {
-      const rider = snapshot.val();
-      if (rider && rider.lat && rider.lng) {
-        riderMarker.setLatLng([rider.lat, rider.lng]);
-        riderMarker.bindPopup("Delivery Partner (Live)").openPopup();
-      }
-    });
-  }
-</script>
+        i++;
+        if (i > steps) clearInterval(interval);
+      }, 50);
+    }
+  </script>
 
-<!-- Scroll to Top Button -->
-<button onclick="window.scrollTo({ top: 0, behavior: 'smooth' });"
-  class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-50">
-  ↑
-</button>
-
-<!-- Floating Help Assistant -->
-<div class="fixed bottom-16 right-6 z-50">
-  <button class="bg-orange-600 text-white px-4 py-2 rounded-full shadow-lg text-sm hover:bg-orange-700 transition-all">
-    💬 Need Help?
+  <!-- Scroll to Top Button -->
+  <button onclick="window.scrollTo({ top: 0, behavior: 'smooth' });"
+    class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-50">
+    ↑
   </button>
-</div>
 
-<!-- Footer -->
-<footer class="bg-orange-600 text-white text-center py-3 text-xs mt-6">
-  Privacy Policy | Terms & Conditions | Contact | Support | Courier Details
-</footer>
+  <!-- Floating Help Assistant -->
+  <div class="fixed bottom-16 right-6 z-50">
+    <button class="bg-orange-600 text-white px-4 py-2 rounded-full shadow-lg text-sm hover:bg-orange-700 transition-all">
+      💬 Need Help?
+    </button>
+  </div>
+
+  <!-- Leaflet CSS/JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 </body>
 </html>
